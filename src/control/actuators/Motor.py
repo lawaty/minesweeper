@@ -1,4 +1,4 @@
-from control.drivers.PWM import PWM, OutOfRangeSignal
+from drivers.PWM import PWM, OutOfRangeSignal
 
 class Motor():
   """

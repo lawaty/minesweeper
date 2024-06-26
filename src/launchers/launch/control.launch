@@ -1,0 +1,5 @@
+<launch>
+  <node name="controller" pkg="control" type="main.py" output="screen">
+      <!-- Add parameters and arguments as needed -->
+  </node>
+</launch>

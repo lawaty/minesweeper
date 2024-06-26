@@ -29,7 +29,7 @@ class PWM:
   
 class PCA(PCA9685):
   @staticmethod
-  def getInst() -> PCA: 
+  def getInst(): 
     if not PCA.__inst:
       i2c = busio.I2C(board.SCL, board.SDA)
       PCA.__inst = PCA(i2c)
