@@ -1,37 +1,40 @@
-from drivers.PWM import PWM, OutOfRangeSignal, PCAConnectionError
+from drivers.PWM import PWM, PCAConnectionError
+from helpers.Logger import throws
 
-class Hover():
-  """
-  Class Controls two motors of a hoverboard together
-  No smoothing because it depends on hover stm32 smoothing
-  """
-  MAX_NEG = 0
-  MAX_POS = 4096
-  SAFE_REGION = 0.9
+class Hover:
+	"""
+	Class Controls two motors of a hoverboard together.
+	No smoothing because it depends on hover STM32 smoothing.
+	"""
+	MAX_NEG = -10000
+	MAX_POS = 10000
+	SAFE_REGION = 0.9
 
-  def __init__(self, pin1, pin2):
-    self.pin1 = pin1
-    self.pin2 = pin2
-    self.__rotational = PWM(pin1, (Hover.MAX_NEG, Hover.MAX_POS))
-    self.__translational = PWM(pin2, (Hover.MAX_NEG, Hover.MAX_POS))
+	@throws(ValueError, PCAConnectionError)
+	def __init__(self, config: tuple):
+		if len(config) != 2:
+			raise ValueError("Hover needs config to be a tuple of two pins")
+		
+		self.pin1 = config[0]
+		self.pin2 = config[1]
+		self.__rotational = PWM(self.pin1, (Hover.MAX_NEG, Hover.MAX_POS))
+		self.__translational = PWM(self.pin2, (Hover.MAX_NEG, Hover.MAX_POS))
 
-    self.neutral =  (Hover.MAX_POS + Hover.MAX_NEG) / 2
-    self.amplitude = abs(Hover.MAX_POS - self.neutral) * self.SAFE_REGION
+		self.neutral = (Hover.MAX_POS + Hover.MAX_NEG) / 2
+		self.amplitude = abs(Hover.MAX_POS - self.neutral) * self.SAFE_REGION
 
-    self.__steer = self.__speed = self.neutral
+		self.__steer = self.neutral
+		self.__speed = self.neutral
 
-  def apply(self, rot:int, trans:int):
-    """
-    :throws OutOfRangeSignal
-    """
-    if not steer:
-      steer = self.__steer
+	def apply(self, rot: int = None, trans: int = None):
+		if rot is None:
+			rot = self.__steer
 
-    if not speed:
-      speed = self.__speed
+		if trans is None:
+			trans = self.__speed
 
-    self.__rotational.apply(steer)
-    self.__translational.apply(speed)
+		self.__rotational.apply(rot)
+		self.__translational.apply(trans)
 
-    self.__steer = steer
-    self.__speed = speed
+		self.__steer = rot
+		self.__speed = trans

@@ -3,11 +3,15 @@
 from actuators.Hover import Hover, PCAConnectionError
 import rospy
 import time
+from helpers.Logger import *
 
 class HoverManualTest:
   SAFE_REGION = 0.9
+
+  __slots__ = ['__hover', '__logger']
   def __init__(self, hover: Hover = None):
     self.__hover = hover
+    self.__logger = Logger.getInst()
 
   def setHover(self, hover: Hover):
     self.__hover = hover
@@ -16,7 +20,6 @@ class HoverManualTest:
     self.__hover.apply(self.__neutral, self.__neutral)
     self.log("Stopped")
     self.wait(3)
-
 
   def moveForward(self, max_speed = False):
     self.__hover.apply(trans = self.__max_pos if max_speed else self.__normal_pos)
@@ -30,16 +33,13 @@ class HoverManualTest:
     self.log(f"Moving Backward with " + "max speed" if max_speed else "average speed")
     self.wait(5)
 
-
   def rotateCW(self, max_speed = False):
     self.__hover.apply(rot=self.__max_pos if max_speed else self.__normal_pos)
-
     self.log(f"Rotating Clockwise with " + "max speed" if max_speed else "average speed")
     self.wait(5)
 
   def rotateACW(self, max_speed = False):
     self.__hover.apply(rot=self.__max_neg if max_speed else self.__normal_neg)
-
     self.log(f"Rotating Anti-Clickwise with " + "max speed" if max_speed else "average speed")
     self.wait(5)
 
@@ -51,7 +51,7 @@ class HoverManualTest:
     """
     :todo make use of logger package
     """
-    rospy.loginfo(msg)
+    self.__logger.log(msg, "info")
 
 rospy.init_node("hover_manual_test", anonymous=True)
 
@@ -62,8 +62,9 @@ while True:
     hover = Hover(12, 13)
     test.log("Hover Initialization Succeeded")
     break
-  except PCAConnectionError:
-    test.log("Couldn't initialize PCA Driver, Retrying in 3 secs")
+  except PCAConnectionError as e:
+    test.logE(e)
+    test.log("Retrying in 3 secs")
     time.sleep(3)
 
 test.stop()

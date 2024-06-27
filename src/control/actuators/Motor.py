@@ -6,7 +6,7 @@ class Motor():
   
   """
   MIN = 0
-  MAX = 4096
+  MAX = 4095
 
   __slots__ = ['pin', '__pwm']
   def __init__(self, pin):

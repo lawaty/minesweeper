@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0.2)
-project(control)
+project(utils)
 
 find_package(catkin REQUIRED COMPONENTS
   rospy
@@ -12,7 +12,7 @@ catkin_python_setup()
 ## Add message files
 add_message_files(
   FILES
-  motors.msg
+  Log.msg
 )
 
 ## Generate added messages and services

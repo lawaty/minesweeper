@@ -3,12 +3,27 @@ project(feedback)
 
 find_package(catkin REQUIRED COMPONENTS
   rospy
-  stdmsgs
+  std_msgs
+  message_generation
 )
 
-catkin_package()
+## Add message files
+add_message_files(
+  FILES
+  Encoder.msg
+)
 
-include_directories(
-# include
-  ${catkin_INCLUDE_DIRS}
+## Generate added messages and services
+generate_messages(
+  DEPENDENCIES
+  std_msgs
+)
+
+catkin_package(
+  CATKIN_DEPENDS rospy std_msgs message_runtime
+)
+
+install(DIRECTORY src/control/
+  DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}/${PROJECT_NAME}
+  FILES_MATCHING PATTERN "*.py"
 )

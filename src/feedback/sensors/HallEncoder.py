@@ -1,24 +1,30 @@
 import Adafruit_GPIO as GPIO
 import time
+from helpers.Logger import BaseCustomException
 
-class Encoder:
+class HallEncoder:
     STATES = [(1, 0, 0), (1, 1, 0), (0, 1, 0), (0, 1, 1), (0, 0, 1), (1, 0, 1)]
     REP_PER_REV = 6  # How many times the states repeat during one revolution
     VELOCITY_BUFFER_SIZE = 5  # Avg velocity since the last nth update instead of instantaneous velocity
+    CIRCUMFERENCE = 30 # in cm
 
     __slots__ = ['__gpio', '__halls', '__state', '__revs', '__direction', '__prev_time', '__velocity_buffer']
     def __init__(self, pins: tuple):
         if len(pins) != 3:
             raise ValueError("Hall needs exactly 3 pins to work")
         
-        self.__gpio = GPIO.get_platform_gpio()
+        try:
+            self.__gpio = GPIO.get_platform_gpio()
+        except RuntimeError as e:
+            raise GPIOConnectionError(str(e))
+
         for pin in pins:
             self.__gpio.setup(pin, GPIO.IN)
 
         self.__halls = pins
         self.__state = self.__get_current_state()
-        if self.__state in Encoder.STATES:
-            self.__state = Encoder.STATES.index(self.__state)
+        if self.__state in HallEncoder.STATES:
+            self.__state = HallEncoder.STATES.index(self.__state)
         else:
             raise InvalidState(f"Halls state {self.__state} is invalid")
 
@@ -28,11 +34,14 @@ class Encoder:
         self.__velocity_buffer = []
 
     def update(self):
+        """
+        :throws 
+        """
         current_time = time.time()
         state = self.__get_current_state()
         
-        if state in Encoder.STATES:
-            index = Encoder.STATES.index(state)
+        if state in HallEncoder.STATES:
+            index = HallEncoder.STATES.index(state)
             delta_index = index - self.__state
             if delta_index == 1 or delta_index == -5:  # CW
                 self.__direction = 1
@@ -40,13 +49,16 @@ class Encoder:
                 self.__direction = -1
             else:
                 raise InvalidTransition(f"Hall invalid transition from {self.STATES[self.__state]} to {self.STATES[index]}")
+            
+            delta_revs = delta_index / len(HallEncoder.STATES) / HallEncoder.REP_PER_REV * self.__direction
 
-            self.__revs += abs(delta_index) / Encoder.REP_PER_REV
+            self.__revs += delta_revs
+            
             time_diff = current_time - self.__prev_time
             if time_diff > 0:
-                velocity = abs(delta_index) / (Encoder.REP_PER_REV * time_diff)
+                velocity = abs(delta_index / time_diff) * self.__direction
                 self.__velocity_buffer.append(velocity)
-                if len(self.__velocity_buffer) > Encoder.VELOCITY_BUFFER_SIZE:
+                if len(self.__velocity_buffer) > HallEncoder.VELOCITY_BUFFER_SIZE:
                     self.__velocity_buffer.pop(0)
 
             self.__state = index
@@ -59,7 +71,16 @@ class Encoder:
         return self.__state
     
     def get_revolutions(self):
+        """
+        :return moved displacement in revolutions
+        """
         return self.__revs
+    
+    def get_disp(self):
+        """
+        :return moved displacement in cm
+        """
+        return self.__revs * self.CIRCUMFERENCE
     
     def get_direction(self):
         return self.__direction
@@ -74,8 +95,14 @@ class Encoder:
                 self.__gpio.input(self.__halls[1]), 
                 self.__gpio.input(self.__halls[2]))
 
-class InvalidState(Exception):
-    pass
+class InvalidState(BaseCustomException):
+    def __init__(msg):
+        super().__init__(msg, "error")
 
-class InvalidTransition(Exception):
-    pass
+class InvalidTransition(BaseCustomException):
+    def __init__(msg):
+        super().__init__(msg, "error")
+
+class GPIOConnectionError(BaseCustomException):
+    def __init__(msg):
+        super().__init__(msg, "error")

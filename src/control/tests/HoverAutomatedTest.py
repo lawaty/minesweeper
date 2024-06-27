@@ -4,7 +4,7 @@ from actuators.Hover import Hover, PCAConnectionError
 import rospy
 import time
 
-class HoverManualTest:
+class HoverAutomatedTest:
   SAFE_REGION = 0.9
   def __init__(self, hover: Hover = None):
     self.__hover = hover
@@ -47,65 +47,56 @@ class HoverManualTest:
     self.log(f"Waiting {secs} secs")
     time.sleep(secs)
 
+  def verify(self):
+    pass
+
   def log(self, msg):
     """
     :todo make use of logger package
     """
     rospy.loginfo(msg)
 
-rospy.init_node("hover_manual_test", anonymous=True)
-
-test = HoverManualTest()
-
-while True:
-  try:
-    hover = Hover(12, 13)
-    test.log("Hover Initialization Succeeded")
-    break
-  except PCAConnectionError:
-    test.log("Couldn't initialize PCA Driver, Retrying in 3 secs")
-    time.sleep(3)
-
 rospy.init_node("automated_test", anonymous=True)
 
+test = HoverAutomatedTest()
+
 test.stop()
-test.wait(3)
-hall1 = 
+test.verify()
 
 test.log("Testing Simple Translation")
 test.moveForward(max_speed=False)
-test.wait(5)
+test.verify()
 test.moveForward(max_speed=True)
-test.wait(5)
+test.verify()
 test.moveBackward(max_speed=False)
-test.wait(5)
+test.verify()
 test.moveBackward(max_speed=True)
-test.wait(5)
+test.verify()
 
 test.log("Testing Simple Rotation")
 test.rotateCW(max_speed=False)
-test.wait(5)
+test.verify()
 test.rotateCW(max_speed=True)
-test.wait(5)
+test.verify()
 test.rotateACW(max_speed=False)
-test.wait(5)
+test.verify()
 test.rotateACW(max_speed=True)
-test.wait(5)
+test.verify()
 
 test.log("Testing Composite Movement (Translational and Rotational at the same time)")
 
 test.moveForward()
 test.rotateCW()
-test.wait(7)
+test.verify()
 
 test.moveForward()
 test.rotateACW()
-test.wait(7)
+test.verify()
 
 test.moveBackward()
 test.rotateCW()
-test.wait(7)
+test.verify()
 
 test.moveBackward()
 test.rotateACW()
-test.wait(7)
+test.verify()

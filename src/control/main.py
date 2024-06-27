@@ -2,12 +2,16 @@
 
 import rospy
 from control.msg import motors
-from control.HoverManualTest import HoverManualTest
+from actuators.Hover import Hover
 
-# Your main script logic follows...
-def main():
-    rospy.init_node("my_node", anonymous=True)
-    # Use imported classes or functions here
+def callback(msg):
+    hover.apply(msg.steer, msg.speed)
 
-if __name__ == "__main__":
-    main()
+rospy.init_node("move", anonymous=True)
+
+hover = Hover(1, 2)
+
+rospy.Subscriber("motors", motors, callback)
+
+# Keep the node running
+rospy.spin()
