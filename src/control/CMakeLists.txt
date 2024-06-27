@@ -22,3 +22,8 @@ generate_messages(
 catkin_package(
   CATKIN_DEPENDS rospy std_msgs message_runtime
 )
+
+install(DIRECTORY src/control/
+  DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}/${PROJECT_NAME}
+  FILES_MATCHING PATTERN "*.py"
+)

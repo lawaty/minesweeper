@@ -1,4 +1,4 @@
-from drivers.PWM import PWM, OutOfRangeSignal
+from drivers.PWM import PWM, OutOfRangeSignal, PCAConnectionError
 
 class Hover():
   """
@@ -21,17 +21,17 @@ class Hover():
     self.__steer = self.__speed = self.neutral
 
   def apply(self, rot:int, trans:int):
-    try:
-      if not steer:
-        steer = self.__steer
+    """
+    :throws OutOfRangeSignal
+    """
+    if not steer:
+      steer = self.__steer
 
-      if not speed:
-        speed = self.__speed
+    if not speed:
+      speed = self.__speed
 
-      self.__rotational.apply(steer)
-      self.__translational.apply(speed)
+    self.__rotational.apply(steer)
+    self.__translational.apply(speed)
 
-      self.__steer = steer
-      self.__speed = speed
-    except OutOfRangeSignal as e:
-      pass
+    self.__steer = steer
+    self.__speed = speed

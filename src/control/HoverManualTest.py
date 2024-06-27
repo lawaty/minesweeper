@@ -1,10 +1,15 @@
-from actuators.Hover import Hover
+#!/usr/bin/env python3
+
+from actuators.Hover import Hover, PCAConnectionError
 import rospy
 import time
 
 class HoverManualTest:
   SAFE_REGION = 0.9
-  def __init__(self, hover: Hover):
+  def __init__(self, hover: Hover = None):
+    self.__hover = hover
+
+  def setHover(self, hover: Hover):
     self.__hover = hover
 
   def stop(self):
@@ -48,47 +53,56 @@ class HoverManualTest:
     """
     rospy.loginfo(msg)
 
-if __name__ == "__main__":
-  test = HoverManualTest(Hover(12, 13))
+rospy.init_node("hover_manual_test", anonymous=True)
 
-  test.log("Init")
-  test.stop()
-  test.wait(3)
+test = HoverManualTest()
 
-  test.log("Simple Translation")
-  test.moveForward(max_speed=False)
-  test.wait(5)
-  test.moveForward(max_speed=True)
-  test.wait(5)
-  test.moveBackward(max_speed=False)
-  test.wait(5)
-  test.moveBackward(max_speed=True)
-  test.wait(5)
+while True:
+  try:
+    hover = Hover(12, 13)
+    test.log("Hover Initialization Succeeded")
+    break
+  except PCAConnectionError:
+    test.log("Couldn't initialize PCA Driver, Retrying in 3 secs")
+    time.sleep(3)
 
-  test.log("Simple Rotation")
-  test.rotateCW(max_speed=False)
-  test.wait(5)
-  test.rotateCW(max_speed=True)
-  test.wait(5)
-  test.rotateACW(max_speed=False)
-  test.wait(5)
-  test.rotateACW(max_speed=True)
-  test.wait(5)
+test.stop()
+test.wait(3)
 
-  test.log("Composite Movement (Translational and Rotational at the same time)")
+test.log("Testing Simple Translation")
+test.moveForward(max_speed=False)
+test.wait(5)
+test.moveForward(max_speed=True)
+test.wait(5)
+test.moveBackward(max_speed=False)
+test.wait(5)
+test.moveBackward(max_speed=True)
+test.wait(5)
 
-  test.moveForward()
-  test.rotateCW()
-  test.wait(7)
+test.log("Testing Simple Rotation")
+test.rotateCW(max_speed=False)
+test.wait(5)
+test.rotateCW(max_speed=True)
+test.wait(5)
+test.rotateACW(max_speed=False)
+test.wait(5)
+test.rotateACW(max_speed=True)
+test.wait(5)
 
-  test.moveForward()
-  test.rotateACW()
-  test.wait(7)
+test.log("Testing Composite Movement (Translational and Rotational at the same time)")
 
-  test.moveBackward()
-  test.rotateCW()
-  test.wait(7)
+test.moveForward()
+test.rotateCW()
+test.wait(7)
 
-  test.moveBackward()
-  test.rotateACW()
-  test.wait(7)
+test.moveForward()
+test.rotateACW()
+test.wait(7)
+
+test.moveBackward()
+test.rotateCW()
+test.wait(7)
+
+test.moveBackward()
+test.rotateACW()
+test.wait(7)

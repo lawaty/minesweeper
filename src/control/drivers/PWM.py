@@ -28,13 +28,20 @@ class PWM:
     return (val - self.__min) / (self.__max - self.__min) * 100 * self.__resolution
   
 class PCA(PCA9685):
+  __inst = None
   @staticmethod
   def getInst(): 
-    if not PCA.__inst:
-      i2c = busio.I2C(board.SCL, board.SDA)
-      PCA.__inst = PCA(i2c)
+    if PCA.__inst is None:
+      try:
+        i2c = busio.I2C(board.SCL, board.SDA)
+        PCA.__inst = PCA(i2c)
+      except Exception as e:
+        raise PCAConnectionError()
     
     return PCA.__inst
 
 class OutOfRangeSignal(Exception):
+  pass
+
+class PCAConnectionError(Exception):
   pass

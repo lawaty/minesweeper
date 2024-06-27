@@ -2,8 +2,7 @@
 
 import rospy
 from control.msg import motors
-from actuators.Hover import Hover  # Example import from actuators package
-from tests.HoverManualTest import HoverManualTest
+from control.HoverManualTest import HoverManualTest
 
 # Your main script logic follows...
 def main():

@@ -1,0 +1,5 @@
+<launch>
+  <node name="hover_manual_test" pkg="control" type="HoverManualTest.py" output="screen">
+      <!-- Add parameters and arguments as needed -->
+  </node>
+</launch>
