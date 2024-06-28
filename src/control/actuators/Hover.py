@@ -10,15 +10,17 @@ class Hover:
 	MAX_POS = 10000
 	SAFE_REGION = 0.9
 
+	__slots__ = ['pin1', 'pin2', '__rotational', '__translational', 'neutral', 'amplitude', '__steer', '__speed']
 	@throws(ValueError, PCAConnectionError)
-	def __init__(self, config: tuple):
+	def __init__(self, config: tuple, die_on_range_err=False):
 		if len(config) != 2:
 			raise ValueError("Hover needs config to be a tuple of two pins")
 		
 		self.pin1 = config[0]
 		self.pin2 = config[1]
-		self.__rotational = PWM(self.pin1, (Hover.MAX_NEG, Hover.MAX_POS))
-		self.__translational = PWM(self.pin2, (Hover.MAX_NEG, Hover.MAX_POS))
+		self.__rotational = PWM(self.pin1, (Hover.MAX_NEG, Hover.MAX_POS), self.__die_on_range_err)
+		self.__translational = PWM(self.pin2, (Hover.MAX_NEG, Hover.MAX_POS), self.__die_on_range_err)
+		self.__die_on_range_err = die_on_range_err
 
 		self.neutral = (Hover.MAX_POS + Hover.MAX_NEG) / 2
 		self.amplitude = abs(Hover.MAX_POS - self.neutral) * self.SAFE_REGION

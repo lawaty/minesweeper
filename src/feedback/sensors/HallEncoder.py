@@ -1,7 +1,19 @@
 import Adafruit_GPIO as GPIO
 import time
-from helpers.Logger import BaseCustomException
+from helpers.Logger import BaseCustomException, throws
 
+class InvalidState(BaseCustomException):
+    def __init__(msg):
+        super().__init__(msg, "error")
+
+class InvalidTransition(BaseCustomException):
+    def __init__(msg):
+        super().__init__(msg, "error")
+
+class GPIOConnectionError(BaseCustomException):
+    def __init__(msg):
+        super().__init__(msg, "error")
+        
 class HallEncoder:
     STATES = [(1, 0, 0), (1, 1, 0), (0, 1, 0), (0, 1, 1), (0, 0, 1), (1, 0, 1)]
     REP_PER_REV = 6  # How many times the states repeat during one revolution
@@ -33,10 +45,8 @@ class HallEncoder:
         self.__prev_time = time.time()
         self.__velocity_buffer = []
 
+    @throws(InvalidTransition)
     def update(self):
-        """
-        :throws 
-        """
         current_time = time.time()
         state = self.__get_current_state()
         
@@ -94,15 +104,3 @@ class HallEncoder:
         return (self.__gpio.input(self.__halls[0]), 
                 self.__gpio.input(self.__halls[1]), 
                 self.__gpio.input(self.__halls[2]))
-
-class InvalidState(BaseCustomException):
-    def __init__(msg):
-        super().__init__(msg, "error")
-
-class InvalidTransition(BaseCustomException):
-    def __init__(msg):
-        super().__init__(msg, "error")
-
-class GPIOConnectionError(BaseCustomException):
-    def __init__(msg):
-        super().__init__(msg, "error")

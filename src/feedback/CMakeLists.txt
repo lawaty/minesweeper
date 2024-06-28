@@ -7,6 +7,8 @@ find_package(catkin REQUIRED COMPONENTS
   message_generation
 )
 
+# catkin_python_setup()
+
 ## Add message files
 add_message_files(
   FILES

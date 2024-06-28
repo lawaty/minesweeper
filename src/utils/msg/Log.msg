@@ -1,3 +1,3 @@
-String serverity
-String msg
-String trace
+string serverity
+string msg
+string trace

@@ -1,7 +1,8 @@
 {
   "python.analysis.extraPaths": [
     "/opt/ros/melodic/lib/python2.7/dist-packages",
-    "./src/utils"
+    "./src/utils",
+    "./src/tests"
   ],
   "ros.distro": "melodic",
   "python.autoComplete.extraPaths": [

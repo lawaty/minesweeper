@@ -1,2 +1,2 @@
-Float32 velocity
-Float32 disp
+float32 velocity
+float32 disp
