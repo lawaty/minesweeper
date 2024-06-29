@@ -1,19 +1,30 @@
-from abc import ABCMeta
+from abc import ABCMeta, abstractmethod
+import inspect
+
 
 class Interface(ABCMeta):
     def __call__(cls, *args, **kwargs):
-        # Create the instance normally
         instance = super().__call__(*args, **kwargs)
 
-        # Get the methods that need to be implemented from the abstract base class
-        for name, method in cls.__abstractmethods__.items():
-            if name not in cls.__dict__:
-                raise TypeError(f"Can't instantiate abstract class {cls.__name__} without {name} method")
+        method_list = [
+            func
+            for func in dir(cls)
+            if callable(getattr(cls, func)) and not func.startswith("__")
+        ]
+        method_list.append("__init__")
 
-            # Check if the signatures match
+        for name in method_list:
+            if not hasattr(cls, name):
+                raise TypeError(
+                    f"Can't instantiate abstract class {cls.__name__} without {name} method"
+                )
+
             interface_method = getattr(cls, name)
-            if not InterfaceEnforcementMeta._signatures_match(method, interface_method):
-                raise TypeError(f"Method {name} in class {cls.__name__} does not match the interface signature")
+            abstract_method = getattr(cls.__bases__[0], name)
+            if not Interface._signatures_match(abstract_method, interface_method):
+                raise TypeError(
+                    f"Method {name} in class {cls.__name__} does not match the interface signature"
+                )
 
         return instance
 

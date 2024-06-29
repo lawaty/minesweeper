@@ -26,7 +26,6 @@ class Logger:
     __inst = None
 
     def __init__(self):
-        rospy.init_node("logs", anonymous=True)
         self.__pub = rospy.Publisher("logs", Log, queue_size=10)
 
         # Logging Persistance

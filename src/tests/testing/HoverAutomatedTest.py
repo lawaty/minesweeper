@@ -1,15 +1,18 @@
 #!/usr/bin/env python3
 
-from actuators.Hover import Hover
-import rospy
 import time
+from helpers.Logger import *
+from testing.interfaces import IHoverAutomated
+from testing.exceptions import OutOfRangeSignal
 
 class HoverAutomatedTest:
   SAFE_REGION = 0.9
-  def __init__(self, hover: Hover = None):
+
+  __slots__ = ['__hover', '__logger']
+  def __init__(self, hover: IHoverAutomated = None):
     self.__hover = hover
 
-  def setHover(self, hover: Hover):
+  def setHover(self, hover: IHoverAutomated):
     self.__hover = hover
 
   def stop(self):
@@ -47,56 +50,56 @@ class HoverAutomatedTest:
     self.log(f"Waiting {secs} secs")
     time.sleep(secs)
 
-  def verify(self):
-    pass
-
   def log(self, msg):
     """
     :todo make use of logger package
     """
     rospy.loginfo(msg)
 
-rospy.init_node("automated_test", anonymous=True)
+  def run(self):
+    try:
+      self.__hover.apply(10000000, 1000000)
+      self.log("Invalid Range Exception Not Thrown")
+    except OutOfRangeSignal:
+      pass
 
-test = HoverAutomatedTest()
+    self.stop()
+    self.__hover.verify()
 
-test.stop()
-test.verify()
+    self.log("Testing Simple Translation")
+    self.moveForward(max_speed=False)
+    self.__hover.verify()
+    self.moveForward(max_speed=True)
+    self.__hover.verify()
+    self.moveBackward(max_speed=False)
+    self.__hover.verify()
+    self.moveBackward(max_speed=True)
+    self.__hover.verify()
 
-test.log("Testing Simple Translation")
-test.moveForward(max_speed=False)
-test.verify()
-test.moveForward(max_speed=True)
-test.verify()
-test.moveBackward(max_speed=False)
-test.verify()
-test.moveBackward(max_speed=True)
-test.verify()
+    self.log("Testing Simple Rotation")
+    self.rotateCW(max_speed=False)
+    self.__hover.verify()
+    self.rotateCW(max_speed=True)
+    self.__hover.verify()
+    self.rotateACW(max_speed=False)
+    self.__hover.verify()
+    self.rotateACW(max_speed=True)
+    self.__hover.verify()
 
-test.log("Testing Simple Rotation")
-test.rotateCW(max_speed=False)
-test.verify()
-test.rotateCW(max_speed=True)
-test.verify()
-test.rotateACW(max_speed=False)
-test.verify()
-test.rotateACW(max_speed=True)
-test.verify()
+    self.log("Testing Composite Movement (Translational and Rotational at the same time)")
 
-test.log("Testing Composite Movement (Translational and Rotational at the same time)")
+    self.moveForward()
+    self.rotateCW()
+    self.__hover.verify()
 
-test.moveForward()
-test.rotateCW()
-test.verify()
+    self.moveForward()
+    self.rotateACW()
+    self.__hover.verify()
 
-test.moveForward()
-test.rotateACW()
-test.verify()
+    self.moveBackward()
+    self.rotateCW()
+    self.__hover.verify()
 
-test.moveBackward()
-test.rotateCW()
-test.verify()
-
-test.moveBackward()
-test.rotateACW()
-test.verify()
+    self.moveBackward()
+    self.rotateACW()
+    self.__hover.verify()

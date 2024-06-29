@@ -5,7 +5,6 @@ import busio
 from adafruit_pca9685 import PCA9685
 from helpers.Logger import *
 
-
 class OutOfRangeSignal(BaseCustomException):
     def __init__(self, msg=""):
         super().__init__(msg, "warn")
@@ -66,7 +65,7 @@ class PCA(PCA9685):
             try:
                 i2c = busio.I2C(board.SCL, board.SDA)
                 PCA.__inst = PCA(i2c)
-            except Exception as e:
+            except Exception or AttributeError as e:
                 raise PCAConnectionError()
 
         return PCA.__inst

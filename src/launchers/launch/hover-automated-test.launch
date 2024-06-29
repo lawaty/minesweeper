@@ -1,4 +1,4 @@
 <launch>
-  <node name="hover_automated_test" pkg="control" type="HoverAutomatedTest.py" output="screen"></node>
+  <node name="hover_automated_test" pkg="control" type="HoverAutomatedTestNode.py" output="screen"></node>
   <node name="Hall" pkg="feedback" type="encoder.py" output="screen"></node>
 </launch>
