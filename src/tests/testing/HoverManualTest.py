@@ -2,14 +2,14 @@
 
 import time
 from helpers.Logger import *
-from testing.interfaces import IHoverManual
+from testing.interfaces import IHover
 from testing.exceptions import OutOfRangeSignal
 
 class HoverManualTest:
   SAFE_REGION = 0.9
 
   __slots__ = ['__hover', '__logger']
-  def __init__(self, hover: IHoverManual = None):
+  def __init__(self, hover: IHover = None):
     self.__hover = hover
     self.__logger = Logger.getInst()
 
@@ -45,7 +45,7 @@ class HoverManualTest:
     time.sleep(secs)
 
   def log(self, msg):
-    self.__logger.log(msg, "info")
+    self.__logger.log(msg)
 
   def run(self):
     try:

@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 
 import rospy
-from control_tests.adapters import HoverManualAdapter
+from control_tests.adapters import HoverAdapter
 from testing.HoverManualTest import HoverManualTest
 from drivers.PWM import PCAConnectionError
 import time
 
 while True:
   try:
-    hover = HoverManualAdapter((11, 12), True)
+    hover = HoverAdapter((11, 12), True)
     break
   except PCAConnectionError as e:
     rospy.loginfo("Retrying in 3 secs")

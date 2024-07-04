@@ -77,25 +77,25 @@ class HallEncoder:
 
         self.__prev_time = current_time
 
-    def get_state(self):
+    def getState(self):
         return self.__state
     
-    def get_revolutions(self):
+    def getRevolutions(self):
         """
         :return moved displacement in revolutions
         """
         return self.__revs
     
-    def get_disp(self):
+    def getdisp(self):
         """
         :return moved displacement in cm
         """
         return self.__revs * self.CIRCUMFERENCE
     
-    def get_direction(self):
+    def getDirection(self):
         return self.__direction
     
-    def get_velocity(self):
+    def getVelocity(self):
         if len(self.__velocity_buffer) == 0:
             return 0.0
         return sum(self.__velocity_buffer) / len(self.__velocity_buffer)
